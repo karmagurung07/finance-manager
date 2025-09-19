@@ -1,1 +1,3 @@
 # finance-manager
+
+# Architecture:
