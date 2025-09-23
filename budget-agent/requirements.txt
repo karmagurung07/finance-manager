@@ -1,0 +1,10 @@
+# Core
+agno>=0.50
+fastmcp>=0.3.0
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+requests>=2.32.3
+openai>=1.0.0
+
+# Tools
+tavily-python>=0.3.3
