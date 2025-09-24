@@ -1,6 +1,7 @@
 import asyncio
 import os
 from dotenv import load_dotenv
+from fastmcp import Client, FastMCP
 import requests
 import json
 from fastapi import FastAPI
@@ -10,16 +11,17 @@ from requests.exceptions import JSONDecodeError
 from agno.os import AgentOS
 
 
-from agno.agent import Agent
+from agno.agent import Agent, RunOutput
 from agno.models.openai import OpenAIChat
 from agno.tools.mcp import MCPTools
-
+mcp = FastMCP()
 load_dotenv()
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
 HISTORY_FILE = "chat_history.json"
 
-llm = OpenAIChat(model_provider="gpt-4.1-mini", model_provider="openai")
-mcp_client = Client(mcp)
+# llm = OpenAIChat(model_provider="gpt-4.1-mini", model_provider="openai")
+# mcp_client = Client(mcp)
 
 # Function to load chat history from file
 def load_history():
@@ -75,31 +77,49 @@ def analyze_query(query, chat_history, agent_type):
     
     # Save the updated chat history
     save_history(chat_history)
-
-async def orchestrator_agent(message: str) -> None:
-    """Orchestrator a financial advising process with access to a budget-agent"""
-
+    
+async def orchestrator_agent(message: str) -> str:
     budget_agent = MCPTools(transport="streamable-http", url="http://127.0.0.1:8000/mcp")
-    await budget_agent.connect()
+    stock_agent = MCPTools(transport="streamable-http", url="http://127.0.0.1:8001/mcp")
 
-    try: 
-        agent = Agent(
-            model=OpenAIChat(),
-            tools=[budget_agent],
-            markdown=True,
-        )
-        prompt = (
-            "You are an orchestrator. For budgeting tasks, call the MCP tool "
-            "`create_budget` (or the budget agent’s default tool) with the user's request.\n\n"
-            f"User: {message}"
-        )
-        await agent.aprint_response(prompt, stream=True)
+    await budget_agent.connect()
+    await stock_agent.connect()
+
+    agent = Agent(
+        model=OpenAIChat(),
+        tools=[budget_agent, stock_agent],
+        markdown=True,
+    )
+    """Orchestrator a financial advising process with access to a budget-agent"""
+    
+    try:
+        system = (
+                "You are an orchestrator. For financial tasks such as budgeting and investing, "
+                "call the MCP tools exposed by the sub-agents:\n"
+                " - Budget agent tool(s): e.g., `create_budget`\n"
+                " - Stock agent tool(s): e.g., `finance_analyzer`\n"
+                "Use them to produce a concise, helpful answer for the user."
+            )
+        prompt = f"{system}\n\nUser: {message}"
+
+        response: RunOutput = await agent.arun(prompt)
+        return response.content
     finally:
-        await budget_agent.close()
+         # Close the Agent first so it releases the tools
+        try:
+            await agent.aclose()
+        except Exception:
+            pass
+        # Then close MCP tool sessions (same task that opened them)
+        try:
+            await stock_agent.close()
+        finally:
+            await budget_agent.close()
+
+        
     
 if __name__ == "__main__":
-    asyncio.run(
-        orchestrator_agent(
-            "Please help me build a budget with $5000 net"
-        )
-    )
+    userInput = input()
+    print(asyncio.run(
+       orchestrator_agent(userInput)
+    ))

@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  budget-agent:
+    build: .
+    container_name: budget-agent
+    env_file:
+      - .env
+    # Run the module and start its MCP server on 0.0.0.0:8000
+    command: >
+      python -c
+      "import budget_agent as m;
+      m.mcp.run(transport='streamable-http', host='0.0.0.0', port=8000)"
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  stock-agent:
+    build: .
+    container_name: stock-agent
+    env_file:
+      - .env
+    # Run the module and start its MCP server on 0.0.0.0:8001
+    command: >
+      python -c
+      "import stock_agent as m;
+      m.mcp.run(transport='streamable-http', host='0.0.0.0', port=8001)"
+    ports:
+      - "8001:8001"
+    restart: unless-stopped

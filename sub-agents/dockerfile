@@ -23,4 +23,4 @@ COPY . .
 EXPOSE 8000
 
 # Start the FastAPI app exposed as "app" in main.py
-ENTRYPOINT ["python", "-u", "budget-agent.py"]
+CMD ["python", "-c", "print('Image ready. Use docker-compose to run services.')"]

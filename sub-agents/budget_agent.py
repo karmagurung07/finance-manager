@@ -9,10 +9,12 @@ from textwrap import dedent
 from typing import Dict, Optional, Any
 from requests.exceptions import JSONDecodeError
 from agno.os import AgentOS
-from agno.agent import Agent
+from agno.agent import Agent, RunOutput
 from agno.models.openai import OpenAIChat
 from agno.tools.reasoning import ReasoningTools
 from agno.tools.tavily import TavilyTools
+
+
 
 mcp = FastMCP()
 
@@ -117,7 +119,8 @@ def budget_agent() -> Agent:
 async def create_budget(message: str) -> str:
   agent = budget_agent()
   try:
-    return await agent.aprint_response(message)
+    response: RunOutput = await agent.arun(message)
+    return response.content
   except Exception as e:
     return f"Tool error: {type(e).__name__}: {e}"
   
