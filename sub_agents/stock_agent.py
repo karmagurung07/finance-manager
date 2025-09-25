@@ -62,7 +62,7 @@ def stock_agent() -> Agent:
 
 # Register the finance agent as a tool
 @mcp.tool
-async def finance_analyzer(query: str) -> str:
+async def finance_analyzer(query: dict) -> str:
     """
     Analyze financial information for a given query using the finance agent.
     """
@@ -70,7 +70,7 @@ async def finance_analyzer(query: str) -> str:
     # You might need to adapt this based on how your agent is designed to be called
     agent = stock_agent()
     try:
-        response: RunOutput = await agent.arun(query)
+        response: RunOutput = await agent.arun(query['processed_input'])
         return response.content
     except Exception as e:
         return f"Tool error: {type(e).__name__}: {e}"
