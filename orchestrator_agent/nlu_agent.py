@@ -1,11 +1,11 @@
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
-
 import os
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
+
 
 load_dotenv()
 

@@ -1,4 +1,3 @@
-
 import os
 import json
 import re
@@ -131,13 +130,12 @@ def extract_memory_json(text: str) -> dict:
   
 retry_count = 0
 @mcp.tool()
-async def create_budget(message: str) -> dict:
-  input = message
+async def create_budget(message: dict) -> dict:
+  input = message['processed_input']
   agent = budget_agent()
   try:
     response: RunOutput = await agent.arun(input)
-    text = response.metrics if hasattr(response, "metrics") else str(response)
-
+    text = response.content if hasattr(response, "content") else str(response)
     mem_updates = extract_memory_json(text)
     if mem_updates:
         update_memory(mem_updates)
@@ -149,7 +147,7 @@ async def create_budget(message: str) -> dict:
       raise RetryAgentRun(
          f"Create or provide information about budget based on the users response. users:{input}"
       )
-    return response.metrics.to_dict()
+    return {"metrics": response.metrics.to_dict(),"content": text}
   except Exception as e:
     return f"Tool error: {type(e).__name__}: {e}"
   

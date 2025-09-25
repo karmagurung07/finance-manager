@@ -23,19 +23,20 @@ research_agent = Agent(
 
 retry_count = 0
 @mcp.tool()
-async def research(message: dict) -> str:
+async def research(message: dict) -> dict:
   input = message['processed_input']
   agent = research_agent
   try:
     response: RunOutput = await agent.arun(input)
     text = response.content if hasattr(response, "content") else str(response) 
-    
+    metrics = response.metrics
+    print(metrics)
     if text == None and retry_count<2:
       retry_count+=1
       raise RetryAgentRun(
          f"Conduct research based on the users query. users:{input}"
       )
-    return response.content
+    return {"metrics": metrics.to_dict(), "content": response.content}
   except Exception as e:
     return f"Tool error: {type(e).__name__}: {e}"
   
