@@ -1,5 +1,5 @@
 # Objective:
-Finance Seer is a gpt-5 powered agent that assists with finanical questions such as budgeting, investing and general finanical literacy. This product is dedicated to providing accessible resources to people from divested and marginalized groups. That is way the this project is built on gpt-5-nano, the cheapest gpt options for power and accessibility.
+Finance Seer is a gpt-5 powered agent that assists with finanical questions such as budgeting, investing and general finanical literacy. This product is dedicated to providing accessible resources to people from divested and marginalized community. That is why we have decided to build this project with gpt-5-nano, the cheapest gpt options for power and accessibility.
 
 # Operation Workflow:
 - User Submitted generated query
@@ -21,7 +21,9 @@ Finance Seer is a gpt-5 powered agent that assists with finanical questions such
 - Model: gpt-5-nano
 
 # Why Agno?
-The main reason for choosing Agno was the it 
+Agno is a lightweight and fast framework that allows for rapid setup and connection. While we were not able to harnass all of Agno's features
+It supports seamless memory connection, workflow and multi-agent based systems. Thus we choose Agno for its comprehensive and digestable building blocks
+that support rapid development and production.
 
 # Getting Started
 - First copy the repository link and use `git clone {url}` in terminal to download the project
