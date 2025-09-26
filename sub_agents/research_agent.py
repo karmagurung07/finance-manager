@@ -1,6 +1,7 @@
 from agno.agent import Agent, RunOutput
 from agno.exceptions import RetryAgentRun
 from agno.tools.tavily import TavilyTools
+from agno.models.openai import OpenAIChat
 from fastmcp import FastMCP
 import os
 import dotenv
@@ -11,7 +12,8 @@ os.environ['TAVILY_API_KEY'] = os.getenv("TAVILY_API_KEY")
 mcp = FastMCP()
 # Create research agent with Tavily search
 research_agent = Agent(
-    name="Research Agent",
+    name="Research Agent",\
+    model=OpenAIChat(id="gpt-5-nano"),
     tools=[TavilyTools()],
     instructions="""
         You are a research assistant that helps find accurate information.

@@ -20,7 +20,7 @@ mcp = FastMCP()
 # Define the finance agent
 def stock_agent() -> Agent:
     return Agent(
-            model=OpenAIChat(id="gpt-4.1-mini"),
+            model=OpenAIChat(id="gpt-5-nano"),
             tools=[ReasoningTools(add_instructions=True), YFinanceTools()],
             instructions=dedent("""\
                 You are a seasoned Wall Street analyst with deep expertise in market analysis! 📊

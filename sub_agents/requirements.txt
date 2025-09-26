@@ -6,6 +6,7 @@ uvicorn[standard]>=0.30.0
 requests>=2.32.3
 openai>=1.0.0
 yfinance
+gradio
 
 # Tools
 tavily-python>=0.3.3

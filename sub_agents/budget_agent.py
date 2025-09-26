@@ -20,7 +20,6 @@ from agno.tools.tavily import TavilyTools
 mcp = FastMCP()
 MAX_TURNS = 8
 load_dotenv()
-os.environ["TAVILY_API_KEY"]= os.getenv("TAVILY_API_KEY")
 
 # ====== BASIC MEMORY ======
 MEMORY_FILE = "budget_memory.json"
@@ -93,9 +92,7 @@ def budget_agent() -> Agent:
 
   return Agent(
     name="budget-agent",
-    model=OpenAIChat(
-        id=os.getenv("OPENAI_MODEL","gpt-4.1-mini")
-      ),
+    model=OpenAIChat(id="gpt-5-nano"),
     instructions=dedent(f"""
             Concise budgeting assistant. Output under ~500 words.
             1) Snapshot (income, expenses, debts, savings)
