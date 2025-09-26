@@ -29,13 +29,23 @@ class NLUOutput(BaseModel):
 
 nlu_agent = Agent(
     name="nlu-agent",
-    model=OpenAIChat(id="gpt-4.1-mini"),
+    model=OpenAIChat(id="gpt-5-nano"),
     description="Extract intent, entities, and user profile from natural language input",
     output_schema=NLUOutput,
     instructions="""
                     Analyze the input to determine user intent (stock, budget or research), 
                     parse the specific questions related to the three possible intents and infer user profile characteristics.
                 """
+)
+
+writer = Agent(
+    model=OpenAIChat(),
+    instructions=(
+        "You are a financial writing agent. Take provided responses (budget/stock/research) "
+        "and write clearly and concisely. Include tables for any budget section. "
+        "Only include sections that have content."
+    ),
+    markdown=True,
 )
 
 if __name__ == '__main__':
