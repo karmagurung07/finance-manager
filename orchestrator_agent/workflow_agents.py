@@ -26,12 +26,15 @@ class NLUOutput(BaseModel):
     user_profile: UserProfile
     processed_input: str = Field(description="Cleaned and normalized input text")
     intent_specific_queries: IntentSpecificQuery
+    chat_history: str = Field(description="history of previous messages")
 
 nlu_agent = Agent(
     name="nlu-agent",
     model=OpenAIChat(id="gpt-5-nano"),
     description="Extract intent, entities, and user profile from natural language input",
     output_schema=NLUOutput,
+    add_history_to_context=True,
+    num_history_runs=3,
     instructions="""
                     Analyze the input to determine user intent (stock, budget or research), 
                     parse the specific questions related to the three possible intents and infer user profile characteristics.
@@ -45,6 +48,8 @@ writer = Agent(
         "and write clearly and concisely. Include tables for any budget section. "
         "Only include sections that have content."
     ),
+    add_history_to_context=True,
+    num_history_runs=3,
     markdown=True,
 )
 

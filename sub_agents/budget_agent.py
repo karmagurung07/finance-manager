@@ -100,6 +100,8 @@ def budget_agent() -> Agent:
             3) Risks + 3 quick wins
             4) 4-week action plan
             Only call tools if strictly needed.
+                        
+            don't use chat_history unless explicitly referenced
 
             If you learn stable facts (income, fixed bills, debts/APRs, savings goal, locale),
             append a single MEMORY_JSON line at the very end with a small JSON object
@@ -110,6 +112,8 @@ def budget_agent() -> Agent:
             {json.dumps(user_ctx, ensure_ascii=False)}
       """),
       tools=tools,
+      add_history_to_context=True,
+      num_history_runs=3,
       add_datetime_to_context = True,
       markdown=True,
   )

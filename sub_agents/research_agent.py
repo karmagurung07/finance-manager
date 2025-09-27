@@ -18,8 +18,13 @@ research_agent = Agent(
     instructions="""
         You are a research assistant that helps find accurate information.
         Use Tavily to search for current information and provide comprehensive answers.
+
+        don't use chat_history unless explicitly referenced
+        
         Always cite your sources and provide relevant context.
     """,
+    add_history_to_context=True,
+    num_history_runs=3, 
     markdown=True
 )
 

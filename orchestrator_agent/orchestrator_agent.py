@@ -4,6 +4,7 @@ import os, json, asyncio
 
 from agno.tools.mcp import MCPTools
 from agno.agent import RunOutput
+from collections import deque
 
 from workflow_agents import nlu_agent
 from workflow_agents import writer
@@ -26,6 +27,8 @@ async def ensure_mcp():
         await _research_mcp.connect()
         _mcp_connected = True
 
+conversation_memory = deque(maxlen=5)
+
 # Persistent MCP tool clients (connect once)
 _budget_mcp = MCPTools(transport="streamable-http", url="http://127.0.0.1:8000/mcp", timeout_seconds=120)
 _stock_mcp  = MCPTools(transport="streamable-http", url="http://127.0.0.1:8001/mcp", timeout_seconds=240)
@@ -40,8 +43,16 @@ async def orchestrator_agent(message: str) -> str:
     await ensure_mcp()
     metrics=[]
 
+    past_context = "\n".join(
+         [f"User: {m['user']}\nAssistant: {m['response']}" for m in conversation_memory]
+    )
+    nlu_input = (
+        f"Past conversation (most recent first):\n{past_context}\n\n"
+        f"New user message:\n{message}"
+    )
+
     try:
-        nlu_resp: RunOutput = await nlu_agent.arun(message)
+        nlu_resp: RunOutput = await nlu_agent.arun(nlu_input)
         response = nlu_resp.content
         if hasattr(response, "intent") and response.intent is not None:
             intent = getattr(response, "intent", None)
@@ -99,8 +110,12 @@ async def orchestrator_agent(message: str) -> str:
             
 
         # 3) Build the writer prompt safely (only include non-empty sections)
-        sections = ["Summarize the available sections below. Include tables for any budget section. "
-                    "Only include sections that are provided."]
+        sections = [
+            "Summarize the available sections below. Include tables for any budget section. "
+            "Only include sections that are provided.",
+            "\nPast conversation for context (only last few turns):\n"
+            + past_context
+        ]
 
         if budget_response:
             sections.append(f"\n=== budget_response ===\n{budget_response["content"]}")
@@ -124,6 +139,9 @@ async def orchestrator_agent(message: str) -> str:
         for metric in metrics:
             name = list(metric.keys())[0]
             logger.info(f"==========={name}===========\n {calculate_costs(metric[name])}")
+        
+
+        conversation_memory.append({"user":message,"response": final_text})
         return final_text
     except Exception as e:
         logger.error(f"Orchestration failed: {e}")

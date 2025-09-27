@@ -21,8 +21,12 @@ mcp = FastMCP()
 def stock_agent() -> Agent:
     return Agent(
             model=OpenAIChat(id="gpt-5-nano"),
+            add_history_to_context=True,
+            num_history_runs=3,
             tools=[ReasoningTools(add_instructions=True), YFinanceTools()],
             instructions=dedent("""\
+                don't use chat_history unless explicitly referenceddon't use chat_history unless explicitly referenced
+                                
                 You are a seasoned Wall Street analyst with deep expertise in market analysis! 📊
 
                 Follow these steps for comprehensive financial analysis:

@@ -30,8 +30,8 @@ async def chat_respond(message: str, history: list[str]):
     reply = await orchestrator_agent(message)
     return reply
 
-with gr.Blocks(title="Finance Orchestrator") as demo:
-    gr.Markdown("## 💸 Finance Orchestrator\nAsk for a budget or stock help. I’ll route to the right agent.")
+with gr.Blocks(title="Finance Seer") as demo:
+    gr.Markdown("## 💸 Finance Seer\nAsk for a budget or stock help. I’ll route to the right agent.")
     gr.ChatInterface(
         fn=chat_respond,                # async OK
         multimodal=False,
